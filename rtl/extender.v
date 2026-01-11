@@ -1,0 +1,17 @@
+module extender(
+    input [31:7] instr,
+    input [2:0] sel,
+    output reg [31:0] ext_out
+);
+    always @(*) begin
+        case (sel)
+            3'b000: ext_out = {{20{instr[31]}}, instr[31:20]};
+            3'b001: ext_out = {{20{instr[31]}}, instr[31:25], instr[11:7]};
+            3'b010: ext_out = {{20{instr[31]}}, instr[7], instr[30:25], instr[11:8], 1'b0};
+            3'b011: ext_out = {instr[31:12], 12'h0};
+            3'b100: ext_out = {{12{instr[31]}}, instr[19:12], instr[20], instr[30:21], 1'b0};
+            default:
+                ext_out = 32'h0;
+        endcase
+    end
+endmodule
