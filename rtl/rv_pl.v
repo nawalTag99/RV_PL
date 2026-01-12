@@ -14,7 +14,8 @@ module rv_pl(
     wire [31:0] D_PC, D_PC_P4, D_instr;
     wire [31:0] D_rf_rd1, D_rf_rd2, D_ext;
     wire [4:0] D_rf_a1, D_rf_a2, D_rf_a3;
-    wire D_sel_result, D_we_dm, D_sel_alu_src_b, D_we_rf, D_branch, D_jump;
+    wire [1:0] D_sel_result;
+    wire D_we_dm, D_sel_alu_src_b, D_we_rf, D_branch, D_jump;
     wire [2:0] D_sel_ext;
     wire [3:0] D_alu_control;
     
@@ -23,7 +24,8 @@ module rv_pl(
     wire [31:0] E_rf_rd1, E_rf_rd2;
     wire [31:0] E_alu_o, E_target_PC, E_dm_wd;
     wire [4:0] E_rf_a1, E_rf_a2, E_rf_a3;
-    wire E_sel_result, E_we_dm, E_sel_alu_src_b, E_we_rf, E_branch, E_jump;
+    wire [1:0] E_sel_result;
+    wire E_we_dm, E_sel_alu_src_b, E_we_rf, E_branch, E_jump;
     wire [3:0] E_alu_control;
     wire E_zero;
     wire [31:0] E_alu_op1, E_alu_op2;
@@ -32,12 +34,14 @@ module rv_pl(
     // MA Stage signals
     wire [31:0] M_alu_o, M_dm_wd, M_PC_P4, M_dm_rd;
     wire [4:0] M_rf_a3;
-    wire M_sel_result, M_we_dm, M_we_rf;
+    wire [1:0] M_sel_result;
+    wire M_we_dm, M_we_rf;
     
     // WB Stage signals
     wire [31:0] W_alu_o, W_dm_rd, W_PC_P4, W_result;
     wire [4:0] W_rf_a3;
-    wire W_sel_result, W_we_rf;
+    wire [1:0] W_sel_result;
+    wire W_we_rf;
     
     // Hazard signals
     wire PLR1_en, PLR2_clr, PLR2_en;
@@ -170,8 +174,8 @@ module rv_pl(
     );
     
     // Branch/Jump target address
-    assign E_target_PC = E_PC + E_ext;
-    
+    assign E_target_PC = (E_jump && E_alu_control == 4'b0000 && E_sel_alu_src_b) ? (E_alu_op1 + E_ext) : (E_PC + E_ext);
+
     // PLR3: EX/MA Pipeline Register
     plr3 PLR3(
         .clk(clk),
@@ -220,7 +224,8 @@ module rv_pl(
     );
     
     //WB stage
-    assign W_result = W_sel_result ? W_dm_rd : W_alu_o;
+    assign W_result = (W_sel_result == 2'b01) ? W_dm_rd : 
+                  (W_sel_result == 2'b10) ? W_PC_P4 : W_alu_o;
     
     //hazard_unit
     hazard_unit HU(
@@ -230,7 +235,7 @@ module rv_pl(
         .E_rs2(E_rf_a2),
         .E_rf_a3(E_rf_a3),
         .E_we_rf(E_we_rf),
-        .E_sel_result(E_sel_result),
+        .E_sel_result(E_sel_result[0]),
         .M_rf_a3(M_rf_a3),
         .M_we_rf(M_we_rf),
         .W_rf_a3(W_rf_a3),

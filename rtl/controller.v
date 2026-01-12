@@ -2,7 +2,7 @@ module controller(
     input [6:0] op,
     input [2:0] funct3,
     input funct7,
-    output reg sel_result,
+    output reg [1:0] sel_result,
     output reg we_dm,
     output reg [3:0] alu_control,
     output reg sel_alu_src_b,
@@ -12,7 +12,7 @@ module controller(
     output reg jump
 );
     always @(*) begin
-        sel_result = 1'b0;
+        sel_result = 2'b00;
         we_dm = 1'b0;
         alu_control = 4'b0000;
         sel_alu_src_b = 1'b0;
@@ -57,9 +57,9 @@ module controller(
             
             7'b0000011: begin //LW
                 we_rf = 1'b1;
-                sel_result = 1'b1; //select data
+                sel_result = 2'b01; 
                 sel_alu_src_b = 1'b1;
-                sel_ext = 3'b000; // I-type immediate
+                sel_ext = 3'b000; 
                 alu_control = 4'b0000;  //for address calculation
             end
             
@@ -88,13 +88,14 @@ module controller(
             7'b1101111: begin //JAL
                 we_rf = 1'b1;
                 jump = 1'b1;
+                sel_result = 2'b10;
                 sel_ext = 3'b100; // J-type immediate
-                //in top module later
             end
             
             7'b1100111: begin //JALR
                 we_rf = 1'b1;
                 jump = 1'b1;
+                sel_result = 2'b10;
                 sel_ext = 3'b000; // I-type immediate
                 sel_alu_src_b = 1'b1;
                 alu_control = 4'b0000;

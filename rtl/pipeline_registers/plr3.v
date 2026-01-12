@@ -5,14 +5,14 @@ module plr3(
     input [31:0] E_dm_wd,
     input [4:0] E_rf_a3,
     input [31:0] E_PC_P4,
-    input E_sel_result,
+    input [1:0] E_sel_result,
     input E_we_dm,
     input E_we_rf,
     output reg [31:0] M_alu_o,
     output reg [31:0] M_dm_wd,
     output reg [4:0] M_rf_a3,
     output reg [31:0] M_PC_P4,
-    output reg M_sel_result,
+    output reg [1:0] M_sel_result,
     output reg M_we_dm,
     output reg M_we_rf
 );

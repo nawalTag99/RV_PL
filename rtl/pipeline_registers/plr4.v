@@ -5,13 +5,13 @@ module plr4(
     input [31:0] M_dm_rd,
     input [4:0] M_rf_a3,
     input [31:0] M_PC_P4,
-    input M_sel_result,
+    input [1:0] M_sel_result,
     input M_we_rf,
     output reg [31:0] W_alu_o,
     output reg [31:0] W_dm_rd,
     output reg [4:0] W_rf_a3,
     output reg [31:0] W_PC_P4,
-    output reg W_sel_result,
+    output reg [1:0] W_sel_result,
     output reg W_we_rf
 );
     always @(posedge clk or negedge rst_n) begin
